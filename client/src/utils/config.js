@@ -5,5 +5,5 @@ const isDevelopment = import.meta.env.MODE === 'development';
 export const getBaseUrl = () => {
   return isDevelopment 
     ? 'http://localhost:3000'
-    : 'https://venzo.vercel.app';  // We'll update this URL
+    : 'https://venzo.onrender.com';  // Backend URL on Render
 }; 
