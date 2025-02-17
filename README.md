@@ -1,4 +1,4 @@
-#VENZO
+#**VENZO**
 # Blog Application
 
 A full-stack blog application for creating and managing blog posts.
