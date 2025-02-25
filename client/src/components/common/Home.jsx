@@ -4,8 +4,9 @@ import { userAuthorContextObj } from "../../contexts/UserAuthorContext.jsx";
 import { adminContextObj } from "../../contexts/AdminContext.jsx";
 import { useUser, useAuth } from "@clerk/clerk-react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { getBaseUrl } from '../../utils/config';
+import { motion } from "framer-motion";
 
 function Home() {
   const { currentUser, setCurrentUser } = useContext(userAuthorContextObj);
@@ -15,6 +16,20 @@ function Home() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1,
+      transition: { duration: 0.5, when: "beforeChildren", staggerChildren: 0.2 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1 }
+  };
 
   // console.log("isSignedIn :", isSignedIn);
   console.log("user :", user);
@@ -132,29 +147,99 @@ function Home() {
       ) : (
         <div>
           {isSignedIn === false && (
-            <div className="hero-section">
-              <div className="hero-content">
-                <h1>Welcome to VENZO</h1>
-                <p className="hero-subtitle">Share your stories with the world</p>
-                <div className="hero-features">
-                  <div className="feature-card">
+            <motion.div 
+              className="hero-section"
+              initial="hidden"
+              animate="visible"
+              variants={containerVariants}
+            >
+              <motion.div 
+                className="hero-content"
+                variants={itemVariants}
+              >
+                <motion.h1 
+                  variants={itemVariants}
+                  className="hero-title"
+                >
+                  Welcome to VENZO
+                </motion.h1>
+                <motion.p 
+                  variants={itemVariants}
+                  className="hero-subtitle"
+                >
+                  Share your stories with the world
+                </motion.p>
+
+                <motion.div 
+                  className="auth-options"
+                  variants={containerVariants}
+                >
+                  <motion.div 
+                    className="auth-option"
+                    variants={itemVariants}
+                  >
+                    <h3>Already a member?</h3>
+                    <p>Sign in to explore a world of captivating blogs, engage with brilliant minds, and continue your journey of discovery.</p>
+                    <Link 
+                      to="/signin"
+                      className="auth-btn signin-btn"
+                    >
+                      Sign In
+                    </Link>
+                  </motion.div>
+
+                  <motion.div 
+                    className="auth-option"
+                    variants={itemVariants}
+                  >
+                    <h3>New to VENZO?</h3>
+                    <p>Join our vibrant community of writers and readers. Create, share, and explore content across exciting genres!</p>
+                    <Link 
+                      to="/signup"
+                      className="auth-btn signup-btn"
+                    >
+                      Sign Up
+                    </Link>
+                  </motion.div>
+                </motion.div>
+
+                <motion.div 
+                  className="hero-features"
+                  variants={containerVariants}
+                >
+                  <motion.div 
+                    className="feature-card"
+                    variants={itemVariants}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
                     <span className="feature-icon">✍️</span>
                     <h3>Write Articles</h3>
                     <p>Share your knowledge and experiences!!</p>
-                  </div>
-                  <div className="feature-card">
+                  </motion.div>
+                  <motion.div 
+                    className="feature-card"
+                    variants={itemVariants}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
                     <span className="feature-icon">👥</span>
                     <h3>Connect</h3>
                     <p>Join a community of writers and readers</p>
-                  </div>
-                  <div className="feature-card">
+                  </motion.div>
+                  <motion.div 
+                    className="feature-card"
+                    variants={itemVariants}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
                     <span className="feature-icon">💡</span>
                     <h3>Learn</h3>
                     <p>Discover new perspectives and ideas!!</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+                  </motion.div>
+                </motion.div>
+              </motion.div>
+            </motion.div>
           )}
           {isSignedIn === true && (
             <div className="profile-section">
