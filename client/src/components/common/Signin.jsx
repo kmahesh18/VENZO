@@ -1,53 +1,22 @@
-import React from 'react';
-import { SignIn } from '@clerk/clerk-react';
+import React from "react";
+import { SignIn } from "@clerk/clerk-react";
 
 function Signin() {
-  const appearance = {
-    layout: {
-      logoPlacement: "inside",
-      socialButtonsVariant: "iconButton",
-      showOptionalFields: true,
-    },
-    variables: {
-      colorPrimary: '#8b5cf6',          // Bootstrap primary blue
-      colorTextOnPrimaryBackground: '#ffffff',
-      colorBackground: '#ffffff',
-      colorInputBackground: '#ffffff',
-      colorInputText: '#8b5cf6',        // Bootstrap default text color
-      colorTextSecondary: '#8b5cf6',    // Bootstrap secondary text
-      colorTextLink: '#8b5cf6',         // Bootstrap primary blue
-      colorDanger: '#8b5cf6',           // Bootstrap danger color
-      fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", sans-serif',
-    },
-    elements: {
-      card: "card shadow p-4 p-md-5",
-      headerTitle: "h3 mb-3 fw-bold text-center",
-      headerSubtitle: "text-secondary mb-4 text-center",
-      formButtonPrimary: 
-        "btn btn-primary w-100 py-2 fw-semibold",
-      formFieldLabel: "form-label fw-semibold",
-      formFieldInput: 
-        "form-control",
-      footerActionLink: "text-primary text-decoration-none fw-semibold",
-      socialButtonsIconButton: 
-        "btn btn-outline-secondary w-100 mb-2",
-      dividerLine: "border-top",
-      dividerText: "text-secondary small px-2",
-      alert: "alert alert-danger",
-    },
-  };
-
   return (
-    <div className="container min-vh-100">
-      <div className="row min-vh-100 align-items-center justify-content-center">
-        <div className="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
-          <SignIn 
-            appearance={appearance}
-            redirectUrl="/"
-            signUpUrl="/signup"
-          />
-        </div>
-      </div>
+    <div className="mt-5">
+      <div className="d-flex justify-content-center align-items-center h-100">
+      <SignIn
+        appearance={{
+          elements: {
+            formButtonPrimary: "bg-[#E85F5C] hover:bg-[#667085]",
+            card: "shadow-xl rounded-2xl border border-[#667085]",
+            headerTitle: "text-[#667085] font-bold",
+          },
+        }}
+        fallbackRedirectUrl="/"
+        signUpUrl="/signup"
+      />
+    </div>
     </div>
   );
 }
