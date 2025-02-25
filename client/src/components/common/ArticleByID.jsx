@@ -12,7 +12,7 @@ import { getBaseUrl } from '../../utils/config';
 function ArticleByID() {
   const { state } = useLocation();
   const { currentUser } = useContext(userAuthorContextObj);
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, reset } = useForm();
   const [editArticleStatus, setEditArticleStatus] = useState(false);
   const navigate = useNavigate();
   const { getToken } = useAuth();
@@ -63,16 +63,37 @@ function ArticleByID() {
 
   //add comment by user
   async function addComment(commentObj) {
-    //add name of user to comment obj
-    commentObj.nameOfUser = currentUser.firstName;
-    console.log(commentObj);
-    //http put request
-    let res = await axios.put(
-      `${getBaseUrl()}/user-api/comment/${currentArticle.articleId}`,
-      commentObj
-    );
-    if (res.data.message === "comment added") {
-      setCommentStatus(res.data.message);
+    try {
+      //add name of user and profile image to comment obj
+      commentObj.nameOfUser = currentUser.firstName;
+      commentObj.userImage = currentUser.profileImageUrl;  // Add user's profile image
+      
+      //http put request
+      let res = await axios.put(
+        `${getBaseUrl()}/user-api/comment/${currentArticle.articleId}`,
+        commentObj
+      );
+      
+      if (res.data.message === "comment added") {
+        // Update the current article state with the new comment
+        setCurrentArticle(res.data.payload);
+        // Update the state with the new comment
+        state.comments = res.data.payload.comments;
+        // Show success message
+        setCommentStatus("Comment posted successfully!");
+        // Clear the comment input
+        reset();
+        
+        // Clear the success message after 3 seconds
+        setTimeout(() => {
+          setCommentStatus("");
+        }, 3000);
+      }
+    } catch (error) {
+      setCommentStatus("Failed to post comment. Please try again.");
+      setTimeout(() => {
+        setCommentStatus("");
+      }, 3000);
     }
   }
 
@@ -155,11 +176,18 @@ function ArticleByID() {
               <h3>Comments</h3>
             </div>
             
+            {/* Show comment status message */}
+            {commentStatus && (
+              <div className={`comment-status ${commentStatus.includes('Failed') ? 'error' : 'success'}`}>
+                {commentStatus}
+              </div>
+            )}
+            
             <div className="comment-list">
-              {state.comments.length === 0 ? (
+              {currentArticle.comments.length === 0 ? (
                 <p className="text-center text-secondary">No comments yet</p>
               ) : (
-                state.comments.map((commentObj) => (
+                currentArticle.comments.map((commentObj) => (
                   <div key={commentObj._id} className="comment-item">
                     <img
                       src={commentObj.userImage || state.authorData.profileImageUrl}
@@ -169,7 +197,7 @@ function ArticleByID() {
                     <div className="comment-content">
                       <div className="comment-header">
                         <span className="comment-username">{commentObj.nameOfUser}</span>
-                        <span className="comment-time">2h ago</span>
+                        <span className="comment-time">Just now</span>
                       </div>
                       <p className="comment-text">{commentObj.comment}</p>
                     </div>
@@ -182,7 +210,7 @@ function ArticleByID() {
               <form onSubmit={handleSubmit(addComment)} className="comment-form">
                 <input
                   type="text"
-                  {...register("comment")}
+                  {...register("comment", { required: true })}
                   className="comment-input"
                   placeholder="Add a comment..."
                 />
