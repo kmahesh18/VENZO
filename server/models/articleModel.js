@@ -39,37 +39,43 @@ const articleSchema = new mongoose.Schema(
     authorData: authorDataSchema,
     articleId: {
       type: String,
-      required: true,
+      required: [true, "Article ID is required"],
+      unique: true,
     },
     title: {
       type: String,
-      required: true,
+      required: [true, "Title is required"],
     },
     category: {
       type: String,
-      required: true,
+      required: [true, "Category is required"],
     },
     content: {
       type: String,
-      required: true,
+      required: [true, "Content is required"],
     },
     dateOfCreation: {
       type: String,
-      required: true,
+      required: [true, "Date of creation is required"],
     },
     dateOfModification: {
       type: String,
-      required: true,
-    },
-
-    comments: {
-      type: [userCommentSchema],
-      required: true,
+      required: [true, "Date of modification is required"],
     },
     isArticleActive: {
       type: Boolean,
-      required: true,
+      default: true,
     },
+    comments: [{
+      commentId: String,
+      comment: String,
+      nameOfUser: String,
+      userImage: String,
+      timestamp: {
+        date: String,
+        time: String
+      }
+    }]
   },
   { strict: "throw" }
 );

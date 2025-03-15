@@ -65,6 +65,11 @@ function ArticleByID() {
   //add comment by user
   async function addComment(commentObj) {
     try {
+      if (!commentObj.comment?.trim()) {
+        toast.error('Comment cannot be empty');
+        return;
+      }
+
       // Get current date and time
       const currentDate = new Date();
       const formattedDate = currentDate.toLocaleDateString('en-US', {
@@ -77,49 +82,52 @@ function ArticleByID() {
         minute: '2-digit',
       });
 
-      //add user details and timestamp to comment obj
+      // Prepare comment object
       const enrichedCommentObj = {
-        ...commentObj,
+        commentId: `comment-${Date.now()}`,
+        comment: commentObj.comment.trim(),
         nameOfUser: currentUser.firstName,
         userImage: currentUser.profileImageUrl,
         timestamp: {
           date: formattedDate,
           time: formattedTime
-        },
-        commentId: Date.now() // unique ID for each comment
+        }
       };
       
-      //http put request
-      let res = await axios.put(
+      // Make API request
+      const res = await axios.put(
         `${getBaseUrl()}/user-api/comment/${currentArticle.articleId}`,
         enrichedCommentObj
       );
       
       if (res.data.message === "comment added") {
-        // Update the current article state with the new comment
-        setCurrentArticle(res.data.payload);
-        // Update the state with the new comment
-        state.comments = res.data.payload.comments;
-        // Show success toast
+        // Update local state with new comment
+        const updatedArticle = res.data.payload;
+        setCurrentArticle(updatedArticle);
+        
+        // Update parent state
+        state.comments = updatedArticle.comments;
+        
+        // Show success notification
         toast.success('Comment posted successfully!', {
           duration: 3000,
           position: 'top-center',
-          style: {
-            background: '#10B981',
-            color: '#fff',
-          },
         });
-        // Clear the comment input
+        
+        // Clear form
         reset();
+        
+        // Scroll to new comment
+        const commentList = document.querySelector('.comment-list');
+        if (commentList) {
+          commentList.scrollTop = commentList.scrollHeight;
+        }
       }
     } catch (error) {
-      toast.error('Failed to post comment. Please try again.', {
+      console.error('Comment error:', error);
+      toast.error(error.response?.data?.message || 'Failed to post comment. Please try again.', {
         duration: 3000,
         position: 'top-center',
-        style: {
-          background: '#EF4444',
-          color: '#fff',
-        },
       });
     }
   }
