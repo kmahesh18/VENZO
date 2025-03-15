@@ -936,57 +936,53 @@ body {
 
 /* Comment Form */
 .comment-form {
-  padding: 1rem 1.2rem;
+  padding: 1rem;
   border-top: 1px solid var(--card-border);
   display: flex;
-  gap: 0.8rem;
-  align-items: center;
+  gap: 1rem;
 }
 
 .comment-input {
   flex: 1;
-  background: var(--background-primary);
-  border: 1px solid var(--card-border);
+  padding: 0.8rem 1rem;
   border-radius: 20px;
-  padding: 0.6rem 1rem;
+  border: 1px solid var(--card-border);
+  background: var(--background-primary);
   color: var(--text-primary);
-  font-size: 0.9rem;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
 }
 
 .comment-input:focus {
   outline: none;
   border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.1);
 }
 
 .comment-submit {
+  padding: 0.8rem 1.5rem;
+  border-radius: 20px;
+  border: none;
   background: var(--accent-primary);
   color: white;
-  border: none;
-  border-radius: 20px;
-  padding: 0.6rem 1.2rem;
-  font-size: 0.85rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .comment-submit:hover {
+  background: var(--accent-secondary);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
 }
 
-/* Custom Scrollbar */
-.comment-list::-webkit-scrollbar {
-  width: 4px;
+.comment-time {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
 }
 
-.comment-list::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.comment-list::-webkit-scrollbar-thumb {
-  background: var(--accent-primary);
-  border-radius: 4px;
+/* Smooth scroll for new comments */
+.comment-list {
+  scroll-behavior: smooth;
 }
 
 /* Auth Buttons */

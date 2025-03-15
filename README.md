@@ -15,12 +15,12 @@ A full-stack blog application for creating and managing blog posts.
 1. Clone the repository
 2. Install dependencies
   ```bash
-  npm install
+  pnpm install
   ```
 3. Configure environment variables
 4. Run the development server
   ```bash
-  npm run dev
+  pnpm run dev
   ```
 
 ## Tech Stack

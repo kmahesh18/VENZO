@@ -8,6 +8,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@clerk/clerk-react";
 import { getBaseUrl } from '../../utils/config';
+import toast, { Toaster } from 'react-hot-toast';
 
 function ArticleByID() {
   const { state } = useLocation();
@@ -64,14 +65,34 @@ function ArticleByID() {
   //add comment by user
   async function addComment(commentObj) {
     try {
-      //add name of user and profile image to comment obj
-      commentObj.nameOfUser = currentUser.firstName;
-      commentObj.userImage = currentUser.profileImageUrl;  // Add user's profile image
+      // Get current date and time
+      const currentDate = new Date();
+      const formattedDate = currentDate.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      });
+      const formattedTime = currentDate.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+
+      //add user details and timestamp to comment obj
+      const enrichedCommentObj = {
+        ...commentObj,
+        nameOfUser: currentUser.firstName,
+        userImage: currentUser.profileImageUrl,
+        timestamp: {
+          date: formattedDate,
+          time: formattedTime
+        },
+        commentId: Date.now() // unique ID for each comment
+      };
       
       //http put request
       let res = await axios.put(
         `${getBaseUrl()}/user-api/comment/${currentArticle.articleId}`,
-        commentObj
+        enrichedCommentObj
       );
       
       if (res.data.message === "comment added") {
@@ -79,21 +100,27 @@ function ArticleByID() {
         setCurrentArticle(res.data.payload);
         // Update the state with the new comment
         state.comments = res.data.payload.comments;
-        // Show success message
-        setCommentStatus("Comment posted successfully!");
+        // Show success toast
+        toast.success('Comment posted successfully!', {
+          duration: 3000,
+          position: 'top-center',
+          style: {
+            background: '#10B981',
+            color: '#fff',
+          },
+        });
         // Clear the comment input
         reset();
-        
-        // Clear the success message after 3 seconds
-        setTimeout(() => {
-          setCommentStatus("");
-        }, 3000);
       }
     } catch (error) {
-      setCommentStatus("Failed to post comment. Please try again.");
-      setTimeout(() => {
-        setCommentStatus("");
-      }, 3000);
+      toast.error('Failed to post comment. Please try again.', {
+        duration: 3000,
+        position: 'top-center',
+        style: {
+          background: '#EF4444',
+          color: '#fff',
+        },
+      });
     }
   }
 
@@ -129,6 +156,7 @@ function ArticleByID() {
 
   return (
     <div className="article-container">
+      <Toaster />
       {editArticleStatus === false ? (
         <>
           <div className="article-header-section">
@@ -173,22 +201,15 @@ function ArticleByID() {
 
           <div className="comments-section">
             <div className="comments-header">
-              <h3>Comments</h3>
+              <h3>Comments ({currentArticle.comments.length})</h3>
             </div>
-            
-            {/* Show comment status message */}
-            {commentStatus && (
-              <div className={`comment-status ${commentStatus.includes('Failed') ? 'error' : 'success'}`}>
-                {commentStatus}
-              </div>
-            )}
             
             <div className="comment-list">
               {currentArticle.comments.length === 0 ? (
                 <p className="text-center text-secondary">No comments yet</p>
               ) : (
                 currentArticle.comments.map((commentObj) => (
-                  <div key={commentObj._id} className="comment-item">
+                  <div key={commentObj.commentId} className="comment-item">
                     <img
                       src={commentObj.userImage || state.authorData.profileImageUrl}
                       alt=""
@@ -197,7 +218,11 @@ function ArticleByID() {
                     <div className="comment-content">
                       <div className="comment-header">
                         <span className="comment-username">{commentObj.nameOfUser}</span>
-                        <span className="comment-time">Just now</span>
+                        <span className="comment-time">
+                          {commentObj.timestamp ? 
+                            `${commentObj.timestamp.date} at ${commentObj.timestamp.time}` : 
+                            'Just now'}
+                        </span>
                       </div>
                       <p className="comment-text">{commentObj.comment}</p>
                     </div>
@@ -210,7 +235,13 @@ function ArticleByID() {
               <form onSubmit={handleSubmit(addComment)} className="comment-form">
                 <input
                   type="text"
-                  {...register("comment", { required: true })}
+                  {...register("comment", { 
+                    required: "Comment cannot be empty",
+                    minLength: {
+                      value: 3,
+                      message: "Comment must be at least 3 characters"
+                    }
+                  })}
                   className="comment-input"
                   placeholder="Add a comment..."
                 />
